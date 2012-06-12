@@ -54,6 +54,17 @@ class Base
 	protected $errors = array();
 
 	/**
+	 * Constructor
+	 *
+	 * @param  array  $config
+	 */
+	public function __construct(array $config = array())
+	{
+		$this->config = $config;
+		$this->ruleSets[] = new RuleSet\Base();
+	}
+
+	/**
 	 * Add a validator for a key
 	 *
 	 * @param             $value
