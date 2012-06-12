@@ -15,9 +15,9 @@ use Fuel\Validation\Value\Valuable as Value;
 $val = new Validation\Base();
 
 $val->validate('username', function(Value $v) {
-	return $v->nonEmpty()
-		and $v->isNumeric()
-		and $v->someCustomRule();
+	return $v->require()
+		and $v->atLeastChars(4)
+		and $v->atMostChars(25);
 });
 
 $input = array('username' => 'Something');

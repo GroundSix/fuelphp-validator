@@ -29,6 +29,7 @@ class Base
 	 */
 	protected $config = array(
 		'valueClass' => 'Fuel\\Validation\\Value\\Base',
+		'errorClass' => 'Fuel\\Validation\\Error\\Base',
 	);
 
 	/**
@@ -49,9 +50,14 @@ class Base
 	protected $input;
 
 	/**
+	 * @var  array  Value\Valuable
+	 */
+	protected $validated;
+
+	/**
 	 * @var  array  Error\Errorable
 	 */
-	protected $errors = array();
+	protected $errors;
 
 	/**
 	 * Constructor
@@ -99,14 +105,27 @@ class Base
 		$this->input =& $input;
 
 		// Iterate over the validators
-		foreach ($this->validators as $validation)
+		// @todo allow wildcard items.*.title in $key and explode those to check each item title
+		foreach ($this->validators as $key => $validation)
 		{
 			list($validator, $value) = $validation;
 			$validator($value);
 
 			if ( ! $value->validates())
 			{
-				$this->errors[$value->getKey()] = $value->getError();
+				// Fetch the error and ensure it's wrapped in an Error object
+				$error = $value->getError();
+				if ( ! $error instanceof Error\Errorable)
+				{
+					$class = $this->config['errorClass'];
+					$error = new $class($value, $error);
+				}
+
+				$this->errors[$value->getKey()] = $error;
+			}
+			else
+			{
+				$this->_setValidated($value);
 			}
 		}
 
@@ -120,6 +139,8 @@ class Base
 	 * @param   mixed        $default
 	 * @return  mixed
 	 * @throws  \RuntimeException
+	 *
+	 * @since  1.0.0
 	 */
 	public function & getInput($key = null, $default = null)
 	{
@@ -134,32 +155,14 @@ class Base
 			return $this->input;
 		}
 
-		$keys  =  explode('.', $key);
-		$input =& $this->input;
-		foreach ($keys as $key)
+		try
 		{
-			if (is_array($input) or $input instanceof ArrayAccess)
-			{
-				if (isset($input[$key]))
-				{
-					$input =& $input[$key];
-					continue;
-				}
-			}
-			elseif (is_object($input))
-			{
-				if (property_exists($input, $key))
-				{
-					$input =& $input->{$key};
-					continue;
-				}
-			}
-
-			// still here? key doesn't exist
+			return $this->_arrayGet($key, $this->input);
+		}
+		catch (\OutOfBoundsException $e)
+		{
 			return $default;
 		}
-
-		return $input;
 	}
 
 	/**
@@ -179,26 +182,85 @@ class Base
 			throw new \RuntimeException('Validation needs to run before input is available.');
 		}
 
-		$keys  =  explode('.', $key);
-		$input =& $this->input;
-		foreach ($keys as $key)
-		{
-			if (is_array($input) or $input instanceof ArrayAccess)
-			{
-				! isset($input[$key]) and $input[$key] = array();
-				$input =& $input[$key];
-			}
-			elseif (is_object($input))
-			{
-				! property_exists($input, $key) and $input->{$key} = array();
-				$input =& $input->{$key};
-			}
-		}
-
-		// Set the value
-		$input = $value;
+		$this->_arraySet($key, $this->input, $value);
 
 		return $this;
+	}
+
+	/**
+	 * Returns an input key by reference
+	 *
+	 * @param   null|string  $key
+	 * @param   mixed        $default
+	 * @return  mixed|bool
+	 * @throws  \RuntimeException
+	 */
+	public function getValidated($key = null, $default = null)
+	{
+		if (is_null($this->validated))
+		{
+			throw new \RuntimeException('Validation needs to run before validated values are available.');
+		}
+
+		// No args? Return the whole thing
+		if (func_num_args() === 0)
+		{
+			return $this->input;
+		}
+
+		try
+		{
+			return $this->_arrayGet($key, $this->input);
+		}
+		catch (\OutOfBoundsException $e)
+		{
+			return $default;
+		}
+	}
+
+	/**
+	 * Add a value as validated
+	 *
+	 * @param   Value\Valuable  $value
+	 * @return  Base
+	 * @throws  \RuntimeException
+	 *
+	 * @since  1.0.0
+	 */
+	protected function _setValidated(Value\Valuable $value)
+	{
+		$this->_arraySet($value->getKey(), $this->validated, $value->get());
+		return $this;
+	}
+
+	/**
+	 * Returns an input key by reference
+	 *
+	 * @param   null|string  $key
+	 * @return  Error\Errorable|bool
+	 * @throws  \RuntimeException
+	 */
+	public function getError($key = null)
+	{
+		if (is_null($this->errors))
+		{
+			throw new \RuntimeException('Validation needs to run before errors are available.');
+		}
+
+		// No args? Return the whole thing
+		if (func_num_args() === 0)
+		{
+			return $this->input;
+		}
+
+		try
+		{
+			return $this->_arrayGet($key, $this->errors);
+		}
+		catch (\OutOfBoundsException $e)
+		{
+			return false;
+		}
 	}
 
 	/**
@@ -245,5 +307,75 @@ class Base
 
 		// All is lost, give up and throw an exception
 		throw new \RuntimeException('The rule '.$rule.' was not found and could not be executed.');
+	}
+
+	/**
+	 * Fetch a dot-notated value from an array or object
+	 *
+	 * @param   string        $key
+	 * @param   array|object  $input
+	 * @return  mixed
+	 * @throws  \OutOfBoundsException
+	 *
+	 * @since  1.0.0
+	 */
+	protected function & _arrayGet($key, & $input)
+	{
+		$keys  =  explode('.', $key);
+		foreach ($keys as $key)
+		{
+			if (is_array($input) or $input instanceof ArrayAccess)
+			{
+				if (isset($input[$key]))
+				{
+					$input =& $input[$key];
+					continue;
+				}
+			}
+			elseif (is_object($input))
+			{
+				if (property_exists($input, $key))
+				{
+					$input =& $input->{$key};
+					continue;
+				}
+			}
+
+			// still here? key doesn't exist
+			throw new \OutOfBoundsException();
+		}
+
+		return $input;
+	}
+
+	/**
+	 * Set a dot-notated value on an array or object
+	 *
+	 * @param   string        $key
+	 * @param   array|object  $input
+	 * @param   mixed         $value
+	 * @return  void
+	 *
+	 * @since  1.0.0
+	 */
+	protected function _arraySet($key, & $input, $value)
+	{
+		$keys  =  explode('.', $key);
+		foreach ($keys as $key)
+		{
+			if (is_array($input) or $input instanceof ArrayAccess)
+			{
+				! isset($input[$key]) and $input[$key] = array();
+				$input =& $input[$key];
+			}
+			elseif (is_object($input))
+			{
+				! property_exists($input, $key) and $input->{$key} = array();
+				$input =& $input->{$key};
+			}
+		}
+
+		// Set the value
+		$input = $value;
 	}
 }
