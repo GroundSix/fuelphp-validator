@@ -23,16 +23,22 @@ class Base implements Valuable
 {
 	/**
 	 * @var  \Fuel\Validation\Base
+	 *
+	 * @since  1.0.0
 	 */
 	protected $validation;
 
 	/**
 	 * @var  string
+	 *
+	 * @since  1.0.0
 	 */
 	protected $key;
 
 	/**
 	 * @var  string
+	 *
+	 * @since  1.0.0
 	 */
 	protected $error;
 
@@ -158,6 +164,8 @@ class Base implements Valuable
 	 * Returns the parent validation instance
 	 *
 	 * @return  \Fuel\Validation\Base
+	 *
+	 * @since  1.0.0
 	 */
 	public function getValidation()
 	{

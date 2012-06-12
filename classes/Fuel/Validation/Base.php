@@ -34,6 +34,8 @@ class Base
 
 	/**
 	 * @var  array  classes and objects to search for rules
+	 *
+	 * @since  1.0.0
 	 */
 	protected $ruleSets = array();
 
@@ -46,16 +48,22 @@ class Base
 
 	/**
 	 * @var  array|object  reference to the input
+	 *
+	 * @since  1.0.0
 	 */
 	protected $values;
 
 	/**
 	 * @var  array  just the values that validated
+	 *
+	 * @since  1.0.0
 	 */
 	protected $validated;
 
 	/**
 	 * @var  array  Error\Errorable
+	 *
+	 * @since  1.0.0
 	 */
 	protected $errors;
 
@@ -63,6 +71,8 @@ class Base
 	 * Constructor
 	 *
 	 * @param  array  $config
+	 *
+	 * @since  1.0.0
 	 */
 	public function __construct(array $config = array())
 	{
@@ -241,6 +251,8 @@ class Base
 	 * @param   null|string  $key
 	 * @return  Error\Errorable|bool
 	 * @throws  \RuntimeException
+	 *
+	 * @since  1.0.0
 	 */
 	public function getError($key = null)
 	{
@@ -263,6 +275,38 @@ class Base
 		{
 			return false;
 		}
+	}
+
+	/**
+	 * Add a Ruleset to search for validation rules
+	 *
+	 * @param   string|object  $class  class name or object
+	 * @param   null|string    $name
+	 * @return  Base
+	 *
+	 * @since  1.0.0
+	 */
+	public function addRuleSet($class, $name = null)
+	{
+		is_null($name) and $name = uniqid();
+		$this->ruleSets[$name] = $class;
+
+		return $this;
+	}
+
+	/**
+	 * Remove a named Ruleset from the Validation
+	 * (unnamed RuleSets cannot be deleted unless you know their key)
+	 *
+	 * @param   string    $name
+	 * @return  Base
+	 *
+	 * @since  1.0.0
+	 */
+	public function removeRuleSet($name)
+	{
+		unset($this->ruleSets[$name]);
+		return $this;
 	}
 
 	/**

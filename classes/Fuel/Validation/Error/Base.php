@@ -23,11 +23,15 @@ class Base implements Errorable
 {
 	/**
 	 * @var  Value
+	 *
+	 * @since  1.0.0
 	 */
 	protected $value;
 
 	/**
 	 * @var  string
+	 *
+	 * @since  1.0.0
 	 */
 	protected $message;
 

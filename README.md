@@ -34,8 +34,9 @@ $success = $val->execute($input);
 ### Step by step
 
 * Create an instance of Validation
-* Start adding *validators* by calling `->validate($field, $validator)` on the Validation object. Validators
-are Closures that take just one arguement: a Validation\Value object (extending Validation\Value\Validatable)
+* Start adding *validators* by calling `->validate($key, $validator)` on the Validation object. The $key is
+the name of the property or array key from the Input you're validating. Validators are Closures that take
+just one arguement: a Validation\Value object (extending Validation\Value\Validatable)
 * Inside the validator you define your rules in the expressive manner exemplified above, ik almost reads
 naturally what it means: *require the value that must be at least 4 characters and at most 25*.
 * Once you've defined your validators you execute() the validation with the input you want it to validate.
@@ -45,5 +46,67 @@ This can be manual input like above, a modified model instance or a superglobal 
 `$val->getValue()`. Both can be called with a $key param to fetch a specific value/error.
 
 **Note:** when you pass objects they may be edited directly during validation.
+
+### Validation methods
+
+#### Included
+
+All these methods are part of the `Fuel\Validation\RuleSet\Base` class. Except for `require()` all will
+validate successfully on empty input, if empty is not valid input the first call should be to `require()`.
+
+* require()
+* matchesValue(string $value, bool $strict = false)
+* matchesInput(string $key, bool $strict = false) - Looks in the validation object's input for the value
+$key and matches it to the value of the current Value object.
+* matchesPattern(string $pattern) - $pattern must be a valid full `preg_match()` pattern.
+* inArray(array $array, $strict = false)
+* atLeastChars($length)
+* atMostChars($length)
+* exactChars($length)
+* atLeastNum($number)
+* atMostNum($number)
+* isEmail() - uses PHP's filter_var()
+* isUrl() - uses PHP's filter_var()
+* isIp() - uses PHP's filter_var()
+
+#### Adding your own RuleSets
+
+You can add more methods by creating a class with methods prefixed by `validate` and the next character
+being uppercase. Below is require as an example of how a method should be defined (note the first param
+being `Fuel\Validation\Value\Valuable` typehinted) and how it should fail:
+
+```php
+<?php
+public function validateRequire(\Fuel\Validation\Value\Valuable $v)
+{
+    $var = $v->get();
+    if ($var === null or $var === '' or $var === array())
+    {
+        $v->setError('nonEmpty');
+        return false;
+    }
+
+    return true;
+}
+```
+
+You can add such a class of your own by calling `addRuleSet($ruleSet)` on the Validation object. The
+`$ruleSet` may be either a string containing a full classname (including the namespace) or an
+instantiated object.
+
+#### PHP internal & user-defined functions
+
+You can also call functions upon the objects. First all the RuleSets will be checked for the function's
+name prefixed with 'validate', if that fails it will do a last attempt to global for a function with the
+rule's name.
+
+As especially PHP function's won't be able to deal with the Validation\Value object the output of
+functions is handled differently. Instead just the actual value will be passed as the first argument. For
+the output there's two possibilities:
+
+* Boolean: true is handled as successful validation, false means it failed and an error is given
+with the rule as the message value. (example: `$v->is_numeric()`)
+* Everything else: the value is changed to whatever will be the output by the function. (example:
+`$v->trim()`)
 
 ### More to come...
