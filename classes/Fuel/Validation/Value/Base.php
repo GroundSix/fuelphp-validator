@@ -78,6 +78,18 @@ class Base implements Valuable
 	}
 
 	/**
+	 * Returns the key of this value in the input
+	 *
+	 * @return  string
+	 *
+	 * @since  1.0.0
+	 */
+	public function getKey()
+	{
+		return $this->key;
+	}
+
+	/**
 	 * Changes the input key for the value
 	 *
 	 * @param   string  $key
@@ -92,15 +104,15 @@ class Base implements Valuable
 	}
 
 	/**
-	 * Returns the key of this value in the input
+	 * A value to indicate the error
 	 *
-	 * @return  string
+	 * @return  \Fuel\Validation\Error\Errorable|string
 	 *
 	 * @since  1.0.0
 	 */
-	public function getKey()
+	public function getError()
 	{
-		return $this->key;
+		return $this->error;
 	}
 
 	/**
@@ -115,18 +127,6 @@ class Base implements Valuable
 	{
 		$this->error = $error;
 		return $this;
-	}
-
-	/**
-	 * A value to indicate the error
-	 *
-	 * @return  \Fuel\Validation\Error\Errorable|string
-	 *
-	 * @since  1.0.0
-	 */
-	public function getError()
-	{
-		return $this->error;
 	}
 
 	/**
