@@ -9,17 +9,41 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 {
 	public function testConstructor()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
+			->disableOriginalConstructor()
+			->getMock();
+
+		$msg = uniqid();
+		$error = new Base($val, $msg);
+
+		$this->assertAttributeEquals($msg, 'message', $error);
+		$this->assertAttributeEquals($val, 'value', $error);
+
+		return array($error, $msg);
 	}
 
-	public function testGetMessage()
+	/**
+	 * @depends  testConstructor
+	 */
+	public function testGetMessage($errormsg)
 	{
-		$this->markTestIncomplete('Unfinished');
+		list($error, $msg) = $errormsg;
+		$this->assertEquals($msg, $error->getMessage());
 	}
 
 	public function testGetKey()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$key = uniqid();
+		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
+			->disableOriginalConstructor()
+			->getMock();
+		$val->expects($this->once())
+			->method('getKey')
+			->will($this->returnValue($key));
+
+		$error = new Base($val, 'message');
+
+		$this->assertEquals($key, $error->getKey());
 	}
 
 	public function testGetValue()

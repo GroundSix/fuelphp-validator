@@ -1,6 +1,6 @@
 <?php
 
-namespace Fuel\Validation\Error;
+namespace Fuel\Validation\Value;
 
 /**
  * @backupGlobals  disabled
@@ -22,7 +22,10 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 		$this->markTestIncomplete('Unfinished');
 	}
 
-	public function testGetKey() {}
+	public function testGetKey()
+	{
+		$this->markTestIncomplete('Unfinished');
+	}
 
 	public function testSetKey()
 	{
