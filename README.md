@@ -109,6 +109,18 @@ with the rule as the message value. (example: `$v->is_numeric()`)
 * Everything else: the value is changed to whatever will be the output by the function. (example:
 `$v->trim()`)
 
+## The Validation object
+
+### Methods
+
+* __validate(string $key, Closure $validator)__
+* __execute(array|object $input)__
+* __getValue(string $key, mixed $default = null)__
+* __setValue(string $key, mixed $value)__
+* __getValidated(string $key, mixed $default = null)__
+* __getError(string $key)__
+* __executeRule(string $rule, \Fuel\Validation\Value\Valuable $value, array $args)__
+
 ## The Validation\Value object
 
 For each validator you create you get passed an instance of `Fuel\Validation\Value\Valuable` which
@@ -116,7 +128,7 @@ represents the value being validated. As you've seen you can call the rules as m
 but there's more you can do with it. You could completely forgo any rules and just do the validating
 within the validator Closure. The most important methods are listed below.
 
-### methods
+### Methods
 
 * __get()__ - returns the current value that you are validating
 * __set(mixed $value)__ - changes the current value being validated
