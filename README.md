@@ -109,4 +109,24 @@ with the rule as the message value. (example: `$v->is_numeric()`)
 * Everything else: the value is changed to whatever will be the output by the function. (example:
 `$v->trim()`)
 
+## The Validation\Value object
+
+For each validator you create you get passed an instance of `Fuel\Validation\Value\Valuable` which
+represents the value being validated. As you've seen you can call the rules as methods upon this object
+but there's more you can do with it. You could completely forgo any rules and just do the validating
+within the validator Closure. The most important methods are listed below.
+
+### methods
+
+* __get()__ - returns the current value that you are validating
+* __set(mixed $value)__ - changes the current value being validated
+* __getKey()__ - returns the key for the value you are validating
+* __setKey(string $key)__ - changes the key
+* __getError()__ - returns any error string already set
+* __setError(string $error)__ - set an error message/language key, once set the field is considered to
+have failed validation
+* __resetError()__ - reset the error for this value to `null`, meaning it'll pass
+* __validates()__ - has the value validated up till now?
+* __getValidation()__ - returns the parent Validation object to which this value belongs
+
 # More to come...
