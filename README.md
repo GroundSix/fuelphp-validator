@@ -54,20 +54,20 @@ This can be manual input like above, a modified model instance or a superglobal 
 All these methods are part of the `Fuel\Validation\RuleSet\Base` class. Except for `require()` all will
 validate successfully on empty input, if empty is not valid input the first call should be to `require()`.
 
-* require()
-* matchesValue(string $value, bool $strict = false)
-* matchesInput(string $key, bool $strict = false) - Looks in the validation object's input for the value
+* __require()__
+* __matchesValue(string $value, bool $strict = false)__
+* __matchesInput(string $key, bool $strict = false)__ - Looks in the validation object's input for the value
 $key and matches it to the value of the current Value object.
-* matchesPattern(string $pattern) - $pattern must be a valid full `preg_match()` pattern.
-* inArray(array $array, $strict = false)
-* atLeastChars($length)
-* atMostChars($length)
-* exactChars($length)
-* atLeastNum($number)
-* atMostNum($number)
-* isEmail() - uses PHP's filter_var()
-* isUrl() - uses PHP's filter_var()
-* isIp() - uses PHP's filter_var()
+* __matchesPattern(string $pattern)__ - $pattern must be a valid full `preg_match()` pattern.
+* __inArray(array $array, $strict = false)__
+* __atLeastChars($length)__
+* __atMostChars($length)__
+* __exactChars($length)__
+* __atLeastNum($number)__
+* __atMostNum($number)__
+* __isEmail()__ - uses PHP's filter_var()
+* __isUrl()__ - uses PHP's filter_var()
+* __isIp()__ - uses PHP's filter_var()
 
 #### Adding your own RuleSets
 
@@ -109,4 +109,4 @@ with the rule as the message value. (example: `$v->is_numeric()`)
 * Everything else: the value is changed to whatever will be the output by the function. (example:
 `$v->trim()`)
 
-### More to come...
+# More to come...
