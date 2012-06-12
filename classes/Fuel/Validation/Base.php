@@ -66,7 +66,7 @@ class Base
 	 */
 	public function __construct(array $config = array())
 	{
-		$this->config = $config;
+		$this->config = $config + $this->config;
 		$this->ruleSets[] = new RuleSet\Base();
 	}
 
@@ -101,8 +101,9 @@ class Base
 	 */
 	public function execute($values)
 	{
-		// Assign the input by reference
-		$this->values = $values;
+		$this->values     = $values;
+		$this->validated  = array();
+		$this->errors     = array();
 
 		// Iterate over the validators
 		// @todo allow wildcard items.*.title in $key and explode those to check each item title

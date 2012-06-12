@@ -60,7 +60,7 @@ class Base implements Valuable
 	 */
 	public function & get()
 	{
-		return $this->validation->getInput($this->key);
+		return $this->validation->getValue($this->key);
 	}
 
 	/**
@@ -73,7 +73,7 @@ class Base implements Valuable
 	 */
 	public function set($newValue)
 	{
-		$this->validation->setInput($this->key, $newValue);
+		$this->validation->setValue($this->key, $newValue);
 		return $this;
 	}
 
@@ -115,6 +115,18 @@ class Base implements Valuable
 	{
 		$this->error = $error;
 		return $this;
+	}
+
+	/**
+	 * A value to indicate the error
+	 *
+	 * @return  \Fuel\Validation\Error\Errorable|string
+	 *
+	 * @since  1.0.0
+	 */
+	public function getError()
+	{
+		return $this->error;
 	}
 
 	/**

@@ -287,12 +287,11 @@ class Base
 	 * Checks whether the given emailaddress passes PHP's filter_var()
 	 *
 	 * @param   Value   $v
-	 * @param   string  $email
 	 * @return  bool
 	 *
 	 * @since  1.0.0
 	 */
-	public function validateIsEmail(Value $v, $email)
+	public function validateIsEmail(Value $v)
 	{
 		// matching only done when non-empty
 		if ($this->_empty($v->get()))
@@ -300,7 +299,7 @@ class Base
 			return true;
 		}
 
-		if (filter_var($email, FILTER_VALIDATE_EMAIL))
+		if ( ! filter_var($v->get(), FILTER_VALIDATE_EMAIL))
 		{
 			$v->setError('isEmail');
 			return false;
@@ -313,12 +312,11 @@ class Base
 	 * Checks whether the given URL passes PHP's filter_var()
 	 *
 	 * @param   Value   $v
-	 * @param   string  $url
 	 * @return  bool
 	 *
 	 * @since  1.0.0
 	 */
-	public function validateIsUrl(Value $v, $url)
+	public function validateIsUrl(Value $v)
 	{
 		// matching only done when non-empty
 		if ($this->_empty($v->get()))
@@ -326,7 +324,7 @@ class Base
 			return true;
 		}
 
-		if (filter_var($url, FILTER_VALIDATE_URL))
+		if ( ! filter_var($v->get(), FILTER_VALIDATE_URL))
 		{
 			$v->setError('isUrl');
 			return false;
@@ -339,12 +337,11 @@ class Base
 	 * Checks whether the given IP passes PHP's filter_var()
 	 *
 	 * @param   Value   $v
-	 * @param   string  $ip
 	 * @return  bool
 	 *
 	 * @since  1.0.0
 	 */
-	public function validateIsIp(Value $v, $ip)
+	public function validateIsIp(Value $v)
 	{
 		// matching only done when non-empty
 		if ($this->_empty($v->get()))
@@ -352,7 +349,7 @@ class Base
 			return true;
 		}
 
-		if (filter_var($ip, FILTER_VALIDATE_IP))
+		if ( ! filter_var($v->get(), FILTER_VALIDATE_IP))
 		{
 			$v->setError('isIp');
 			return false;
