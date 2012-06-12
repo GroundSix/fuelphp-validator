@@ -47,10 +47,10 @@ class Base
 	/**
 	 * @var  array|object  reference to the input
 	 */
-	protected $input;
+	protected $values;
 
 	/**
-	 * @var  array  Value\Valuable
+	 * @var  array  just the values that validated
 	 */
 	protected $validated;
 
@@ -94,15 +94,15 @@ class Base
 	/**
 	 * Executes the validation
 	 *
-	 * @param   $input
+	 * @param   $values
 	 * @return  bool
 	 *
 	 * @since  1.0.0
 	 */
-	public function execute( & $input)
+	public function execute($values)
 	{
 		// Assign the input by reference
-		$this->input =& $input;
+		$this->values = $values;
 
 		// Iterate over the validators
 		// @todo allow wildcard items.*.title in $key and explode those to check each item title
@@ -133,7 +133,7 @@ class Base
 	}
 
 	/**
-	 * Returns an input key by reference
+	 * Returns an value key by reference
 	 *
 	 * @param   null|string  $key
 	 * @param   mixed        $default
@@ -142,9 +142,9 @@ class Base
 	 *
 	 * @since  1.0.0
 	 */
-	public function & getInput($key = null, $default = null)
+	public function & getValue($key = null, $default = null)
 	{
-		if (is_null($this->input))
+		if (is_null($this->values))
 		{
 			throw new \RuntimeException('Validation needs to run before input is available.');
 		}
@@ -152,12 +152,12 @@ class Base
 		// No args? Return the whole thing
 		if (func_num_args() === 0)
 		{
-			return $this->input;
+			return $this->values;
 		}
 
 		try
 		{
-			return $this->_arrayGet($key, $this->input);
+			return $this->_arrayGet($key, $this->values);
 		}
 		catch (\OutOfBoundsException $e)
 		{
@@ -166,7 +166,7 @@ class Base
 	}
 
 	/**
-	 * Modify a specific key in the input, will create arrays when necessary
+	 * Modify a specific key in the values, will create arrays when necessary
 	 *
 	 * @param   string  $key
 	 * @param   mixed   $value
@@ -175,25 +175,27 @@ class Base
 	 *
 	 * @since  1.0.0
 	 */
-	public function setInput($key, $value)
+	public function setValue($key, $value)
 	{
-		if (is_null($this->input))
+		if (is_null($this->values))
 		{
 			throw new \RuntimeException('Validation needs to run before input is available.');
 		}
 
-		$this->_arraySet($key, $this->input, $value);
+		$this->_arraySet($key, $this->values, $value);
 
 		return $this;
 	}
 
 	/**
-	 * Returns an input key by reference
+	 * Returns an validated value
 	 *
 	 * @param   null|string  $key
 	 * @param   mixed        $default
-	 * @return  mixed|bool
+	 * @return  mixed
 	 * @throws  \RuntimeException
+	 *
+	 * @since  1.0.0
 	 */
 	public function getValidated($key = null, $default = null)
 	{
@@ -205,12 +207,12 @@ class Base
 		// No args? Return the whole thing
 		if (func_num_args() === 0)
 		{
-			return $this->input;
+			return $this->validated;
 		}
 
 		try
 		{
-			return $this->_arrayGet($key, $this->input);
+			return $this->_arrayGet($key, $this->validated);
 		}
 		catch (\OutOfBoundsException $e)
 		{
@@ -219,11 +221,10 @@ class Base
 	}
 
 	/**
-	 * Add a value as validated
+	 * Modify a specific key in the validated values, will create arrays when necessary
 	 *
-	 * @param   Value\Valuable  $value
+	 * @param   \Fuel\Validation\Value\Valuable  $value
 	 * @return  Base
-	 * @throws  \RuntimeException
 	 *
 	 * @since  1.0.0
 	 */
@@ -250,7 +251,7 @@ class Base
 		// No args? Return the whole thing
 		if (func_num_args() === 0)
 		{
-			return $this->input;
+			return $this->errors;
 		}
 
 		try
