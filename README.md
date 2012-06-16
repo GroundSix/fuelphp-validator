@@ -45,7 +45,9 @@ This can be manual input like above, a modified model instance or a superglobal 
 * You can fetch a list of errors by calling `$val->getError()` or a list of validated values by calling
 `$val->getValue()`. Both can be called with a $key param to fetch a specific value/error.
 
-**Note:** when you pass objects they may be edited directly during validation.
+**Note:** when you pass objects they may be edited directly during validation.  
+**Note 2:** to access deeper array values you can use dot.natation: `'groups.admin.name'` would access 
+`'$input['group']['admin']['name']` for example. This works both on arrays and objects.
 
 ### Validation methods
 
