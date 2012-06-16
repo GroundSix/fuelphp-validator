@@ -48,11 +48,25 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 
 	public function testGetValue()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
+			->disableOriginalConstructor()
+			->getMock();
+
+		$msg = uniqid();
+		$error = new Base($val, $msg);
+
+		$this->assertEquals($val, $error->getValue());
 	}
 
 	public function testToString()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
+			->disableOriginalConstructor()
+			->getMock();
+
+		$msg = uniqid();
+		$error = new Base($val, $msg);
+
+		$this->assertEquals($msg, strval($error));
 	}
 }
