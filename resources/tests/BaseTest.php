@@ -9,12 +9,33 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 {
 	public function testConstructor()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$config = array(
+			'valueClass' => 'bruceWillis',
+			'errorClass' => 'ghost',
+			'iSee' => 'deadPeople'
+		);
+		$val = new Base($config);
+
+		$this->assertAttributeEquals($config, 'config', $val);
 	}
 
 	public function testValidate()
 	{
-		$this->markTestIncomplete('Unfinished');
+		$val = new Base();
+		$key = 'sense';
+		$validator = function($v) { return true; };
+
+		$val->validate($key, $validator);
+
+		$prop = new \ReflectionProperty($val, 'validators');
+		$prop->setAccessible(true);
+		$validators = $prop->getValue($val);
+
+		$this->assertArrayHasKey($key, $validators);
+		list($testValidator, $testValue) = $validators[$key];
+
+		$this->assertSame($validator, $testValidator);
+		$this->assertEquals($key, $testValue->getKey());
 	}
 
 	public function testExecute()
