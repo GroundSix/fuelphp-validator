@@ -316,7 +316,7 @@ class Base
 		$keyPrefix  = substr($key, 0, $pos);
 		$keySuffix  = substr($key, $pos + 1);
 
-		$values = $this->_arrayGet(rtrim($keyPrefix), $this->values);
+		$values = $this->_arrayGet(rtrim($keyPrefix, '.'), $this->values);
 		foreach ($values as $key => $val)
 		{
 			$k = $keyPrefix.$key.$keySuffix;
@@ -424,27 +424,27 @@ class Base
 	protected function & _arrayGet($key, & $input)
 	{
 		$keys  =  explode('.', $key);
-		foreach ($keys as $key)
+		foreach ($keys as $k)
 		{
 			if (is_array($input) or $input instanceof ArrayAccess)
 			{
-				if (isset($input[$key]))
+				if (isset($input[$k]))
 				{
-					$input =& $input[$key];
+					$input =& $input[$k];
 					continue;
 				}
 			}
 			elseif (is_object($input))
 			{
-				if (property_exists($input, $key))
+				if (property_exists($input, $k))
 				{
-					$input =& $input->{$key};
+					$input =& $input->{$k};
 					continue;
 				}
 			}
 
 			// still here? key doesn't exist
-			throw new \OutOfBoundsException();
+			throw new \OutOfBoundsException($key);
 		}
 
 		return $input;
