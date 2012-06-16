@@ -83,8 +83,8 @@ class Base
 	/**
 	 * Add a validator for a key
 	 *
-	 * @param             $value
-	 * @param   \Closure  $validator
+	 * @param   Value\Valuable|string  $value
+	 * @param   Closure                $validator
 	 * @return  Base
 	 *
 	 * @since  1.0.0
@@ -104,7 +104,7 @@ class Base
 	/**
 	 * Executes the validation
 	 *
-	 * @param   $values
+	 * @param   array|object  $values
 	 * @return  bool
 	 *
 	 * @since  1.0.0
@@ -116,27 +116,14 @@ class Base
 		$this->errors     = array();
 
 		// Iterate over the validators
-		// @todo allow wildcard items.*.title in $key and explode those to check each item title
 		foreach ($this->validators as $key => $validation)
 		{
 			list($validator, $value) = $validation;
-			$validator($value);
+			$values = $this->explodeKey($key, $value);
 
-			if ( ! $value->validates())
+			foreach ($values as $v)
 			{
-				// Fetch the error and ensure it's wrapped in an Error object
-				$error = $value->getError();
-				if ( ! $error instanceof Error\Errorable)
-				{
-					$class = $this->config['errorClass'];
-					$error = new $class($value, $error);
-				}
-
-				$this->errors[$value->getKey()] = $error;
-			}
-			else
-			{
-				$this->_setValidated($value);
+				$this->executeValidator($validator, $v);
 			}
 		}
 
@@ -307,6 +294,75 @@ class Base
 	{
 		unset($this->ruleSets[$name]);
 		return $this;
+	}
+
+	/**
+	 * Explode key with * to multiple keys with $value objects
+	 *
+	 * @param   string          $key
+	 * @param   Value\Valuable  $value
+	 * @return  array
+	 *
+	 * @since  1.0.0
+	 */
+	protected function explodeKey($key, Value\Valuable $value)
+	{
+		if (($pos = strpos($key, '*')) === false)
+		{
+			return array($value);
+		}
+
+		$keys       = array();
+		$keyPrefix  = substr($key, 0, $pos);
+		$keySuffix  = substr($key, $pos + 1);
+
+		$values = $this->_arrayGet(rtrim($keyPrefix), $this->values);
+		foreach ($values as $key => $val)
+		{
+			$k = $keyPrefix.$key.$keySuffix;
+			if (strpos($keySuffix, '*') === false)
+			{
+				$v = clone $value;
+				$keys[$k] = $v->setKey($k);
+			}
+			else
+			{
+				$keys += $this->explodeKey($k, $value);
+			}
+		}
+
+		return $keys;
+	}
+
+	/**
+	 * Executes the validator for the given value
+	 *
+	 * @param   Closure         $validator
+	 * @param   Value\Valuable  $value
+	 * @return  void
+	 *
+	 * @since  1.0.0
+	 */
+	protected function executeValidator(Closure $validator, Value\Valuable $value)
+	{
+		$validator($value);
+
+		if ( ! $value->validates())
+		{
+			// Fetch the error and ensure it's wrapped in an Error object
+			$error = $value->getError();
+			if ( ! $error instanceof Error\Errorable)
+			{
+				$class = $this->config['errorClass'];
+				$error = new $class($value, $error);
+			}
+
+			$this->errors[$value->getKey()] = $error;
+		}
+		else
+		{
+			$this->_setValidated($value);
+		}
 	}
 
 	/**
