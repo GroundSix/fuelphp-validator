@@ -73,6 +73,15 @@ interface Valuable
 	/**
 	 * A value to indicate the error
 	 *
+	 * @return  \Fuel\Validation\Error\Errorable|string
+	 *
+	 * @since  1.0.0
+	 */
+	public function getError();
+
+	/**
+	 * A value to indicate the error
+	 *
 	 * @param   string  $error
 	 * @return  Valuable
 	 *
