@@ -254,14 +254,12 @@ class Base
 			return $this->errors;
 		}
 
-		try
-		{
-			return $this->_arrayGet($key, $this->errors);
-		}
-		catch (\OutOfBoundsException $e)
+		if ( ! array_key_exists($key, $this->errors))
 		{
 			return false;
 		}
+
+		return $this->errors[$key];
 	}
 
 	/**
