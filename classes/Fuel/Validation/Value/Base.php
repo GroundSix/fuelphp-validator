@@ -40,6 +40,13 @@ class Base implements Valuable
 	 *
 	 * @since  1.0.0
 	 */
+	protected $label;
+
+	/**
+	 * @var  string
+	 *
+	 * @since  1.0.0
+	 */
 	protected $error;
 
 	/**
@@ -48,13 +55,15 @@ class Base implements Valuable
 	 *
 	 * @param  \Fuel\Validation\Base  $val
 	 * @param  string                 $key
+	 * @param  string|null            $label
 	 *
 	 * @since  1.0.0
 	 */
-	public function __construct(Validation\Base $val, $key)
+	public function __construct(Validation\Base $val, $key, $label = null)
 	{
 		$this->validation = $val;
 		$this->key = $key;
+		$this->label = $label;
 	}
 
 	/**
@@ -106,6 +115,32 @@ class Base implements Valuable
 	public function setKey($key)
 	{
 		$this->key = $key;
+		return $this;
+	}
+
+	/**
+	 * Returns the label for this value in the input
+	 *
+	 * @return  string
+	 *
+	 * @since  1.0.0
+	 */
+	public function getLabel()
+	{
+		return $this->label;
+	}
+
+	/**
+	 * Changes the label for the value
+	 *
+	 * @param   string  $label
+	 * @return  Valuable
+	 *
+	 * @since  1.0.0
+	 */
+	public function setLabel($label)
+	{
+		$this->label = $label;
 		return $this;
 	}
 

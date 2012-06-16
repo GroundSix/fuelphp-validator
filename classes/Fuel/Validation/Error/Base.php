@@ -58,7 +58,15 @@ class Base implements Errorable
 	 */
 	public function getMessage()
 	{
-		return $this->message;
+		$message = $this->value->getValidation()->getMessage($this->message, $this->message);
+
+		$replacements = array(
+			'{name}'   => $this->getKey(),
+			'{value}'  => $this->getValue()->get(),
+			'{label}'  => $this->getValue()->getLabel(),
+		);
+
+		return str_replace(array_keys($replacements), array_values($replacements), $message);
 	}
 
 	/**

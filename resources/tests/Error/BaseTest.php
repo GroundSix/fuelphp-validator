@@ -22,13 +22,26 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 		return array($error, $msg);
 	}
 
-	/**
-	 * @depends  testConstructor
-	 */
-	public function testGetMessage($errormsg)
+	public function testGetMessage()
 	{
-		list($error, $msg) = $errormsg;
-		$this->assertEquals($msg, $error->getMessage());
+		$msg = 'whoHasTheRing';
+		$translation = 'Frodo';
+
+		$v = $this->getMock('Fuel\\Validation\\Base');
+		$v->expects($this->once())
+			->method('getMessage')
+			->with($this->equalTo($msg))
+			->will($this->returnValue($translation));
+
+		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
+			->disableOriginalConstructor()
+			->getMock();
+		$val->expects($this->once())
+			->method('getValidation')
+			->will($this->returnValue($v));
+
+		$error = new Base($val, $msg);
+		$this->assertEquals($translation, $error->getMessage());
 	}
 
 	public function testGetKey()
@@ -60,13 +73,23 @@ class BaseTest extends \PHPUnit_Framework_TestCase
 
 	public function testToString()
 	{
+		$msg = 'whoHadTheRing';
+		$translation = 'Smeagol';
+
+		$v = $this->getMock('Fuel\\Validation\\Base');
+		$v->expects($this->once())
+			->method('getMessage')
+			->with($this->equalTo($msg))
+			->will($this->returnValue($translation));
+
 		$val = $this->getMockBuilder('Fuel\\Validation\\Value\\Base')
 			->disableOriginalConstructor()
 			->getMock();
+		$val->expects($this->once())
+			->method('getValidation')
+			->will($this->returnValue($v));
 
-		$msg = uniqid();
 		$error = new Base($val, $msg);
-
-		$this->assertEquals($msg, strval($error));
+		$this->assertEquals($translation, strval($error));
 	}
 }

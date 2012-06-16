@@ -71,6 +71,25 @@ interface Valuable
 	public function getKey();
 
 	/**
+	 * Changes the label for value
+	 *
+	 * @param   string  $label
+	 * @return  Valuable
+	 *
+	 * @since  1.0.0
+	 */
+	public function setLabel($label);
+
+	/**
+	 * Returns the label for value
+	 *
+	 * @return  string
+	 *
+	 * @since  1.0.0
+	 */
+	public function getLabel();
+
+	/**
 	 * A value to indicate the error
 	 *
 	 * @return  \Fuel\Validation\Error\Errorable|string

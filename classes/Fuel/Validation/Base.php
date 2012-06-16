@@ -28,8 +28,8 @@ class Base
 	 * @since  1.0.0
 	 */
 	protected $config = array(
-		'valueClass' => 'Fuel\\Validation\\Value\\Base',
-		'errorClass' => 'Fuel\\Validation\\Error\\Base',
+		'valueClass'  => 'Fuel\\Validation\\Value\\Base',
+		'errorClass'  => 'Fuel\\Validation\\Error\\Base',
 	);
 
 	/**
@@ -68,6 +68,11 @@ class Base
 	protected $errors;
 
 	/**
+	 * @var  array  Validation error messages
+	 */
+	protected $messages;
+
+	/**
 	 * Constructor
 	 *
 	 * @param  array  $config
@@ -85,16 +90,17 @@ class Base
 	 *
 	 * @param   Value\Valuable|string  $value
 	 * @param   Closure                $validator
+	 * @param   string|null            $label
 	 * @return  Base
 	 *
 	 * @since  1.0.0
 	 */
-	public function validate($value, Closure $validator)
+	public function validate($value, Closure $validator, $label = null)
 	{
 		if ( ! $value instanceof Value\Valuable)
 		{
 			$class = $this->config['valueClass'];
-			$value = new $class($this, $value);
+			$value = new $class($this, $value, $label ?: $value);
 		}
 
 		$this->validators[$value->getKey()] = array($validator, $value);
@@ -263,6 +269,31 @@ class Base
 	}
 
 	/**
+	 * Get the error message for a key (or the full array of messages)
+	 *
+	 * @param   null|string  $key
+	 * @return  array|string
+	 *
+	 * @return  1.0.0
+	 */
+	public function getErrorMessage($key = null)
+	{
+		$error = $this->getError($key);
+		if (is_array($error))
+		{
+			$errors = array();
+			foreach ($error as $key => $e)
+			{
+				$errors[$key] = strval($e);
+			}
+
+			return $errors;
+		}
+
+		return strval($error);
+	}
+
+	/**
 	 * Add a Ruleset to search for validation rules
 	 *
 	 * @param   string|object  $class  class name or object
@@ -292,6 +323,35 @@ class Base
 	{
 		unset($this->ruleSets[$name]);
 		return $this;
+	}
+
+	/**
+	 * Set a message for a given error key
+	 *
+	 * @param   string  $error
+	 * @param   string  $message
+	 * @return  Base
+	 *
+	 * @since  2.0.0
+	 */
+	public function setMessage($error, $message)
+	{
+		$this->messages[$error] = $message;
+		return $this;
+	}
+
+	/**
+	 * Get an error message for an error key
+	 *
+	 * @param   string  $error
+	 * @param   mixed   $default
+	 * @return  string
+	 *
+	 * @since  2.0.0
+	 */
+	public function getMessage($error, $default = null)
+	{
+		return isset($this->messages[$error]) ? $this->messages[$error] : $default;
 	}
 
 	/**
