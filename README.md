@@ -45,9 +45,26 @@ This can be manual input like above, a modified model instance or a superglobal 
 * You can fetch a list of errors by calling `$val->getError()` or a list of validated values by calling
 `$val->getValue()`. Both can be called with a $key param to fetch a specific value/error.
 
-**Note:** when you pass objects they may be edited directly during validation.  
-**Note 2:** to access deeper array values you can use dot.natation: `'groups.admin.name'` would access 
+**Note:** when you pass objects they may be edited directly during validation.
+**Note 2:** to access deeper array values you can use dot.natation: `'groups.admin.name'` would access
 `'$input['group']['admin']['name']` for example. This works both on arrays and objects.
+
+### Wildcards for validating deeper array values
+
+If you submit multiple users for example you don't want to have to repeat the validation rules definition
+for each user submitted. For this you can use the asterisk (*) as a wildcard. In the example below it's
+the expectation you named your fields like `users[0][username]` and `users[0][password]` in the form.
+
+```php
+<?php
+$v->validate('users.*.username', function(Value\Valuable $v) {
+    return $v->require() and $v->atLeastChars(4);
+})->validate('users.*.password', function (Value\Valuable $v) {
+    return $v->require() and $v->atLeastChars(4);
+});
+```
+
+These will validate the username and password for each entry in the 'users' array of the input.
 
 ### Validation methods
 
