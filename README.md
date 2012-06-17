@@ -4,12 +4,14 @@ A framework independent validation library that focuses on expressiveness and fl
 
 ## Installation
 
-You can download the code from [Github](https://github.com/fuelphp/validation) or install it through packagist
-by including `fuel/validation` in your project composer.json require:
+It is best installed it through packagist by including `fuel/validation` in your project composer.json require:
 
     "require": {
         "fuel/validation":  "dev-master"
     }
+
+You can also download it from Github, but no autoloader is provided so you'll need to register it with your own 
+PSR-0 compatible autoloader.
 
 ## Usage
 
@@ -72,6 +74,7 @@ These will validate the username and password for each entry in the 'users' arra
 
 All these methods are part of the `Fuel\Validation\RuleSet\Base` class. Except for `require()` all will
 validate successfully on empty input, if empty is not valid input the first call should be to `require()`.
+Each also returns `true` or `false` but that is only to allow usage like above (with `and` and `or`).
 
 * __require()__
 * __matchesValue(string $value, bool $strict = false)__
@@ -132,13 +135,16 @@ with the rule as the message value. (example: `$v->is_numeric()`)
 
 ### Methods
 
-* __validate(string $key, Closure $validator)__
-* __execute(array|object $input)__
-* __getValue(string $key, mixed $default = null)__
-* __setValue(string $key, mixed $value)__
-* __getValidated(string $key, mixed $default = null)__
-* __getError(string $key)__
-* __executeRule(string $rule, \Fuel\Validation\Value\Valuable $value, array $args)__
+* __validate(string $key, Closure $validator):Fuel\Validation\Base__
+* __execute(array|object $input):bool__
+* __getValue(string $key, mixed $default = null):Fuel\Validation\Value\Base__
+* __setValue(string $key, mixed $value):Fuel\Validation\Base|array__
+* __getValidated(string $key, mixed $default = null):string|array__
+* __getError(string $key):Fuel\Validation\Error\Base|array__
+* __getErrorMessage(string $key):string|array__
+* __setMessage(string $error, string $message):Fuel\Validation\Base__
+* __setMessage(string $error):string__
+* __executeRule(string $rule, \Fuel\Validation\Value\Valuable $value, array $args):mixed__
 
 ## The Validation\Value object
 
