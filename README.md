@@ -4,7 +4,8 @@ A framework independent validation library that focuses on expressiveness and fl
 
 ## Installation
 
-It is best installed it through packagist by including `fuel/validation` in your project composer.json require:
+It is best installed it through [packagist](http://packagist.org/packages/fuel/validation) by including 
+`fuel/validation` in your project composer.json require:
 
     "require": {
         "fuel/validation":  "dev-master"
