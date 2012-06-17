@@ -80,7 +80,7 @@ Each also returns `true` or `false` but that is only to allow usage like above (
 Eache of these checks whether the value being validated...
 
 * __require()__  
-...is non-empty, contrary to PHP zero (`0` and `'0'`) is considered non-empty.
+...is non-empty, zero (`0` or `'0'`) is considered non-empty (contrary to PHP).
 * __matchesValue(string $value, bool $strict = false)__  
 ...matches a specific value.
 * __matchesInput(string $key, bool $strict = false)__  
