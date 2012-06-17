@@ -27,16 +27,6 @@ $val->validate('username', function($v) {
 		and $v->atLeastChars(4)
 		and $v->atMostChars(25);
 });
-// bit more complex, screen_name validation dependent upon username:
-$val->validate('screen_name', function($v) {
-	if ($v->get() and $v->get() === $v->getValidation()->getValue('username'))
-	{
-		$v->setError('Screen name must not match the chosen username.');
-		return false;
-	}
-
-	return $v->require() and $v->atLeastChars(4);
-});
 
 $input = array('username' => 'Something', 'screen_name' => 'Another');
 
@@ -207,5 +197,21 @@ Reset the error for this value to `null`, meaning it'll pass
 Has the value validated up till now?
 * __getValidation():Fuel\Validation\Base__  
 Returns the parent Validation object to which this value belongs
+
+### More complex example using the Validation\Value object
+
+```php
+<?php
+// screen_name validation dependent upon username:
+$val->validate('screen_name', function($v) {
+	if ($v->get() and $v->get() === $v->getValidation()->getValue('username'))
+	{
+		$v->setError('Screen name must not match the chosen username.');
+		return false;
+	}
+
+	return $v->require() and $v->atLeastChars(4);
+});
+```
 
 # More to come...
