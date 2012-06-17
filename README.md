@@ -27,8 +27,18 @@ $val->validate('username', function($v) {
 		and $v->atLeastChars(4)
 		and $v->atMostChars(25);
 });
+// bit more complex, screen_name validation dependent upon username:
+$val->validate('screen_name', function($v) {
+	if ($v->get() and $v->get() === $v->getValidation()->getValue('username'))
+	{
+		$v->setError('Screen name must not match the chosen username.');
+		return false;
+	}
 
-$input = array('username' => 'Something');
+	return $v->require() and $v->atLeastChars(4);
+});
+
+$input = array('username' => 'Something', 'screen_name' => 'Another');
 
 $success = $val->execute($input);
 ```
@@ -155,7 +165,7 @@ Add a new validator for $key.
 Run the validators on $input.
 * __getValue(string $key, mixed $default = null):mixed__  
 (after/during execution) Fetch a value from the input.
-* __setValue(string $key, mixed $value):Fuel\Validation\Base__
+* __setValue(string $key, mixed $value):Fuel\Validation\Base__  
 (after/during execution) Change a value on the input.
 * __getValidated(string $key, mixed $default = null):string|array__  
 (after/during execution) Fetch a value that already validated successfully.
@@ -179,15 +189,23 @@ within the validator Closure. The most important methods are listed below.
 
 ### Methods
 
-* __get()__ - returns the current value that you are validating
-* __set(mixed $value)__ - changes the current value being validated
-* __getKey()__ - returns the key for the value you are validating
-* __setKey(string $key)__ - changes the key
-* __getError()__ - returns any error string already set
-* __setError(string $error)__ - set an error message/language key, once set the field is considered to
-have failed validation
-* __resetError()__ - reset the error for this value to `null`, meaning it'll pass
-* __validates()__ - has the value validated up till now?
-* __getValidation()__ - returns the parent Validation object to which this value belongs
+* __get():mixed__  
+Returns the current value that you are validating
+* __set(mixed $value):Fuel\Validation\Value\Valuable__  
+Changes the current value being validated
+* __getKey():string__  
+Returns the key for the value you are validating
+* __setKey(string $key):Fuel\Validation\Value\Valuable__  
+Changes the key
+* __getError():string__  
+Returns any error string already set
+* __setError(string $error):Fuel\Validation\Value\Valuable__  
+Set an error message/language key, once set the field is considered to have failed validation
+* __resetError():Fuel\Validation\Value\Valuable__  
+Reset the error for this value to `null`, meaning it'll pass
+* __validates():bool__  
+Has the value validated up till now?
+* __getValidation():Fuel\Validation\Base__  
+Returns the parent Validation object to which this value belongs
 
 # More to come...
