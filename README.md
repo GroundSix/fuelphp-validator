@@ -49,7 +49,7 @@ This can be manual input like above, a modified model instance or a superglobal 
 `$val->getValue()`. Both can be called with a $key param to fetch a specific value/error.
 
 **Note:** when you pass objects they may be edited directly during validation.  
-**Note 2:** to access deeper array values you can use dot.natation: `'groups.admin.name'` would access
+**Note 2:** to access deeper array values you can use dot.notation: `'groups.admin.name'` would access
 `'$input['group']['admin']['name']` for example. This works both on arrays and objects.
 
 ### Wildcards for validating deeper array values
@@ -77,7 +77,7 @@ All these methods are part of the `Fuel\Validation\RuleSet\Base` class. Except f
 validate successfully on empty input, if empty is not valid input the first call should be to `require()`.
 Each also returns `true` or `false` but that is only to allow usage like above (with `and` and `or`).
 
-Eache of these checks whether the value being validated...
+Each of these checks whether the value being validated...
 
 * __require()__  
 ...is non-empty, zero (`0` or `'0'`) is considered non-empty (contrary to PHP).
