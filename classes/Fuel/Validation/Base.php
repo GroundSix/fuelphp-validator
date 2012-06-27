@@ -278,9 +278,9 @@ class Base
 	 */
 	public function getErrorMessage($key = null)
 	{
-		$error = $this->getError($key);
-		if (is_array($error))
+		if (func_num_args() === 0)
 		{
+			$error = $this->getError();
 			$errors = array();
 			foreach ($error as $key => $e)
 			{
@@ -290,7 +290,7 @@ class Base
 			return $errors;
 		}
 
-		return strval($error);
+		return strval($this->getError($key));
 	}
 
 	/**
