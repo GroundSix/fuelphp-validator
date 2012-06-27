@@ -4,12 +4,15 @@ A framework independent validation library that focuses on expressiveness and fl
 
 ## Installation
 
-You can download the code from [Github](https://github.com/fuelphp/validation) or install it through packagist
-by including `fuel/validation` in your project composer.json require:
+It is best installed it through [packagist](http://packagist.org/packages/fuel/validation) by including 
+`fuel/validation` in your project composer.json require:
 
     "require": {
         "fuel/validation":  "dev-master"
     }
+
+You can also download it from Github, but no autoloader is provided so you'll need to register it with your own 
+PSR-0 compatible autoloader.
 
 ## Usage
 
@@ -26,7 +29,7 @@ $val->validate('username', function($v) {
 		and $v->atMostChars(25);
 });
 
-$input = array('username' => 'Something');
+$input = array('username' => 'Something', 'screen_name' => 'Another');
 
 $success = $val->execute($input);
 ```
@@ -46,7 +49,7 @@ This can be manual input like above, a modified model instance or a superglobal 
 `$val->getValue()`. Both can be called with a $key param to fetch a specific value/error.
 
 **Note:** when you pass objects they may be edited directly during validation.  
-**Note 2:** to access deeper array values you can use dot.natation: `'groups.admin.name'` would access
+**Note 2:** to access deeper array values you can use dot.notation: `'groups.admin.name'` would access
 `'$input['group']['admin']['name']` for example. This works both on arrays and objects.
 
 ### Wildcards for validating deeper array values
@@ -72,21 +75,36 @@ These will validate the username and password for each entry in the 'users' arra
 
 All these methods are part of the `Fuel\Validation\RuleSet\Base` class. Except for `require()` all will
 validate successfully on empty input, if empty is not valid input the first call should be to `require()`.
+Each also returns `true` or `false` but that is only to allow usage like above (with `and` and `or`).
 
-* __require()__
-* __matchesValue(string $value, bool $strict = false)__
-* __matchesInput(string $key, bool $strict = false)__ - Looks in the validation object's input for the value
-$key and matches it to the value of the current Value object.
-* __matchesPattern(string $pattern)__ - $pattern must be a valid full `preg_match()` pattern.
-* __inArray(array $array, $strict = false)__
-* __atLeastChars($length)__
-* __atMostChars($length)__
-* __exactChars($length)__
-* __atLeastNum($number)__
-* __atMostNum($number)__
-* __isEmail()__ - uses PHP's filter_var()
-* __isUrl()__ - uses PHP's filter_var()
-* __isIp()__ - uses PHP's filter_var()
+Each of these checks whether the value being validated...
+
+* __require()__  
+...is non-empty, zero (`0` or `'0'`) is considered non-empty (contrary to PHP).
+* __matchesValue(string $value, bool $strict = false)__  
+...matches a specific value.
+* __matchesInput(string $key, bool $strict = false)__  
+...matches another input with $key in the current validation object.
+* __matchesPattern(string $pattern)__  
+$pattern must be a valid full `preg_match()` pattern.
+* __inArray(array $array, $strict = false)__  
+...is in the given array.
+* __atLeastChars($length)__  
+...is at least $length characters long.
+* __atMostChars($length)__  
+...is at most $length characters long.
+* __exactChars($length)__  
+...is exactly $length characters long.
+* __atLeastNum($number)__  
+...is numericly at least $number.
+* __atMostNum($number)__  
+...is numericly at most $number.
+* __isEmail()__  
+...validates as a valid emailaddress according to PHP's filter_var().
+* __isUrl()__  
+...validates as a valid URL according to PHP's filter_var().
+* __isIp()__  
+...validates as a valid IP address according to PHP's filter_var().
 
 #### Adding your own RuleSets
 
@@ -132,13 +150,26 @@ with the rule as the message value. (example: `$v->is_numeric()`)
 
 ### Methods
 
-* __validate(string $key, Closure $validator)__
-* __execute(array|object $input)__
-* __getValue(string $key, mixed $default = null)__
-* __setValue(string $key, mixed $value)__
-* __getValidated(string $key, mixed $default = null)__
-* __getError(string $key)__
-* __executeRule(string $rule, \Fuel\Validation\Value\Valuable $value, array $args)__
+* __validate(string $key, Closure $validator):Fuel\Validation\Base__  
+Add a new validator for $key.
+* __execute(array|object $input):bool__  
+Run the validators on $input.
+* __getValue(string $key, mixed $default = null):mixed__  
+(after/during execution) Fetch a value from the input.
+* __setValue(string $key, mixed $value):Fuel\Validation\Base__  
+(after/during execution) Change a value on the input.
+* __getValidated(string $key, mixed $default = null):string|array__  
+(after/during execution) Fetch a value that already validated successfully.
+* __getError(string $key):Fuel\Validation\Error\Base|array__  
+(after/during execution) Fetch a specific error object or all in an array.
+* __getErrorMessage(string $key):string|array__  
+(after/during execution) Fetch just a specific error message or all in an array.
+* __setMessage(string $error, string $message):Fuel\Validation\Base__  
+Set a message for the given $error key.
+* __getMessage(string $error, mixed $default):string__  
+Get a message for the given $error key.
+* __executeRule(string $rule, \Fuel\Validation\Value\Valuable $value, array $args):mixed__  
+Execute a rule within the validaion object on the given $value with additional $args.
 
 ## The Validation\Value object
 
@@ -149,15 +180,39 @@ within the validator Closure. The most important methods are listed below.
 
 ### Methods
 
-* __get()__ - returns the current value that you are validating
-* __set(mixed $value)__ - changes the current value being validated
-* __getKey()__ - returns the key for the value you are validating
-* __setKey(string $key)__ - changes the key
-* __getError()__ - returns any error string already set
-* __setError(string $error)__ - set an error message/language key, once set the field is considered to
-have failed validation
-* __resetError()__ - reset the error for this value to `null`, meaning it'll pass
-* __validates()__ - has the value validated up till now?
-* __getValidation()__ - returns the parent Validation object to which this value belongs
+* __get():mixed__  
+Returns the current value that you are validating
+* __set(mixed $value):Fuel\Validation\Value\Valuable__  
+Changes the current value being validated
+* __getKey():string__  
+Returns the key for the value you are validating
+* __setKey(string $key):Fuel\Validation\Value\Valuable__  
+Changes the key
+* __getError():string__  
+Returns any error string already set
+* __setError(string $error):Fuel\Validation\Value\Valuable__  
+Set an error message/language key, once set the field is considered to have failed validation
+* __resetError():Fuel\Validation\Value\Valuable__  
+Reset the error for this value to `null`, meaning it'll pass
+* __validates():bool__  
+Has the value validated up till now?
+* __getValidation():Fuel\Validation\Base__  
+Returns the parent Validation object to which this value belongs
+
+### More complex example using the Validation\Value object
+
+```php
+<?php
+// screen_name validation dependent upon username:
+$val->validate('screen_name', function($v) {
+	if ($v->get() and $v->get() === $v->getValidation()->getValue('username'))
+	{
+		$v->setError('Screen name must not match the chosen username.');
+		return false;
+	}
+
+	return $v->require() and $v->atLeastChars(4);
+});
+```
 
 # More to come...
