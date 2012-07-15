@@ -17,6 +17,20 @@ use Fuel\Validation;
  *
  * @package  Fuel\Validation
  *
+ * @method  require
+ * @method  matchesValue
+ * @method  matchesInput
+ * @method  matchesPattern
+ * @method  inArray
+ * @method  atLeastChars
+ * @method  atMostChars
+ * @method  exactChars
+ * @method  atLeastNum
+ * @method  atMostNum
+ * @method  isEmail
+ * @method  isUrl
+ * @method  isIp
+ *
  * @since  1.0.0
  */
 interface Valuable

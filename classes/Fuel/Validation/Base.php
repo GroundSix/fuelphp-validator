@@ -111,21 +111,30 @@ class Base
 	 * Executes the validation
 	 *
 	 * @param   array|object  $values
+	 * @param   array         $partial
 	 * @return  bool
+	 * @throws  \RuntimeException
 	 *
 	 * @since  1.0.0
 	 */
-	public function execute($values)
+	public function execute($values, array $partial = null)
 	{
 		$this->values     = $values;
 		$this->validated  = array();
 		$this->errors     = array();
 
+		$validators = is_null($partial) ? array_keys($this->validators) : $partial;
+
 		// Iterate over the validators
-		foreach ($this->validators as $key => $validation)
+		foreach ($validators as $val)
 		{
-			list($validator, $value) = $validation;
-			$values = $this->explodeKey($key, $value);
+			if ( ! isset($this->validators[$val]))
+			{
+				throw new \RuntimeException('Unknown validator in partial validation.');
+			}
+
+			list($validator, $value) = $this->validators[$val];
+			$values = $this->explodeKey($val, $value);
 
 			foreach ($values as $v)
 			{
