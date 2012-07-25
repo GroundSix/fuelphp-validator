@@ -93,8 +93,8 @@ class Base
 	 */
 	public function validateMatchesInput(Value $v, $key, $strict = false)
 	{
-		$match = $this->validateMatchesValue($v, $v->getValidation()->getInput($key), $strict);
-		! $match and $this->setError('matchesInput');
+		$match = $this->validateMatchesValue($v, $v->getValidation()->getValue($key), $strict);
+		! $match and $v->setError('matchesInput');
 
 		return $match;
 	}
