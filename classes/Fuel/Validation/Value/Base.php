@@ -87,7 +87,7 @@ class Base implements Valuable
 	 *
 	 * @since  1.0.0
 	 */
-	public function & get()
+	public function get()
 	{
 		return $this->validation->getValue($this->key);
 	}

@@ -155,7 +155,7 @@ class Base
 	 *
 	 * @since  1.0.0
 	 */
-	public function & getValue($key = null, $default = null)
+	public function getValue($key = null, $default = null)
 	{
 		if (is_null($this->values))
 		{
@@ -195,7 +195,7 @@ class Base
 			throw new \RuntimeException('Validation needs to run before input is available.');
 		}
 
-		$this->_arraySet($key, $this->values, $value);
+		$this->values = $this->_arraySet($key, $this->values, $value);
 
 		return $this;
 	}
@@ -243,7 +243,7 @@ class Base
 	 */
 	protected function _setValidated(Value\Valuable $value)
 	{
-		$this->_arraySet($value->getKey(), $this->validated, $value->get());
+		$this->validated = $this->_arraySet($value->getKey(), $this->validated, $value->get());
 		return $this;
 	}
 
@@ -488,33 +488,40 @@ class Base
 	 *
 	 * @since  1.0.0
 	 */
-	protected function & _arrayGet($key, & $input)
+	protected function _arrayGet($key, $input)
 	{
-		$keys  =  explode('.', $key);
-		foreach ($keys as $k)
+		// Just return it if there's only a single key (left)
+		if (strpos($key, '.') === false)
 		{
-			if (is_array($input) or $input instanceof ArrayAccess)
+			if (is_object($input) and isset($input->{$key}))
 			{
-				if (isset($input[$k]))
-				{
-					$input =& $input[$k];
-					continue;
-				}
+				return $input->{$key};
 			}
-			elseif (is_object($input))
+			elseif ((is_array($input) or $input instanceof ArrayAccess) and isset($input[$key]))
 			{
-				if (property_exists($input, $k))
-				{
-					$input =& $input->{$k};
-					continue;
-				}
+				return $input[$key];
 			}
 
 			// still here? key doesn't exist
 			throw new \OutOfBoundsException($key);
 		}
 
-		return $input;
+		// ... else get the next key and recurse
+		$keys = explode('.', $key);
+		$key = array_shift($keys);
+		if (is_object($input))
+		{
+			! property_exists($input, $key) and $input->{$key} = array();
+			return $this->_arrayGet(implode('.', $keys), $input[$key]);
+		}
+		elseif (is_array($input) or $input instanceof ArrayAccess)
+		{
+			! isset($input[$key]) and $input[$key] = array();
+			return $this->_arrayGet(implode('.', $keys), $input[$key]);
+		}
+
+		// still here? key doesn't exist
+		throw new \OutOfBoundsException($key);
 	}
 
 	/**
@@ -523,28 +530,34 @@ class Base
 	 * @param   string        $key
 	 * @param   array|object  $input
 	 * @param   mixed         $value
-	 * @return  void
+	 * @return  array|object
 	 *
 	 * @since  1.0.0
 	 */
-	protected function _arraySet($key, & $input, $value)
+	protected function _arraySet($key, $input, $value)
 	{
-		$keys  =  explode('.', $key);
-		foreach ($keys as $key)
+		// Just change it if there's only a single key (left)
+		if (strpos($key, '.') === false)
 		{
-			if (is_array($input) or $input instanceof ArrayAccess)
-			{
-				! isset($input[$key]) and $input[$key] = array();
-				$input =& $input[$key];
-			}
-			elseif (is_object($input))
-			{
-				! property_exists($input, $key) and $input->{$key} = array();
-				$input =& $input->{$key};
-			}
+			is_object($input) ? $input->{$key} = $value : $input[$key] = $value;
+			return $input;
 		}
 
-		// Set the value
-		$input = $value;
+		// ... else get the next key and recurse
+		$keys = explode('.', $key);
+		$key = array_shift($keys);
+		if (is_array($input) or $input instanceof ArrayAccess)
+		{
+			! isset($input[$key]) and $input[$key] = array();
+			$input[$key] = $this->_arraySet(implode('.', $keys), $input[$key], $value);
+		}
+		elseif (is_object($input))
+		{
+			! property_exists($input, $key) and $input->{$key} = array();
+			$input[$key] = $this->_arraySet(implode('.', $keys), $input[$key], $value);
+		}
+
+		// Return the changed input back tail-recursively
+		return $input;
 	}
 }

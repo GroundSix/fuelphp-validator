@@ -53,7 +53,7 @@ interface Valuable
 	 *
 	 * @since  1.0.0
 	 */
-	public function & get();
+	public function get();
 
 	/**
 	 * Modifies the value this object represents
