@@ -5,6 +5,7 @@
 	"keywords": ["validation","validator"],
 	"homepage": "http://fuelphp.com/",
 	"license": "MIT",
+	"minimum-stability": "dev",
 	"require": {
 		"php": ">=5.3.0"
 	},
