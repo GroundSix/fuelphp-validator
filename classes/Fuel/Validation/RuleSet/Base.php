@@ -117,7 +117,7 @@ class Base
 		}
 
 		// match...
-		if (preg_match($pattern, $v->get()) > 0)
+		if (preg_match($pattern, $v->get()) == 0)
 		{
 			$v->setError('matchesPattern');
 			return false;
